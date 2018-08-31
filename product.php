@@ -12,18 +12,44 @@ if(!isset($_SESSION["name"])){
 </head>
 <body>
 	<?php
-		echo "Welcome ! ".$_SESSION["name"];
+		echo "<center><h1><font color='brown'>Welcome ".$_SESSION["name"]."!</font></h1></center>";
 		if(isset($_GET['logout'])==1){
 			session_destroy();
 			header("location:index.php?action=login");
 		}
 	?>
-	<a href="?logout=1">Logout</a>
 	<div class="products">
+		<?php
+		if(isset($_GET["action"])=='account')
+		{
+		?>
+		<center><h3>Account Dashboard</h3></center>
+		<p><b>Name          : </b><?php echo $_SESSION["name"]." ".$_SESSION["second"] ?></p>
+		<p><b>Email Address : </b><?php echo $_SESSION["email"] ?></p>
+		<p><b>Account Created On : </b><?php echo $_SESSION["date"] ?></p>
 		<ul>
-			<li>One</li>
-			<li>Two</li>
+			<li><a href="product.php?act=shopping">My Shopping Lists</a></li>
 		</ul>
+		<?php
+		}elseif(isset($_GET["act"])=='shopping')
+		{
+		?>
+		<center><h3>My Shopping List</h3></center>
+		<pre>You have no items in your Shopping List</pre>
+		<ul>
+			<li><a href="product.php?action=account">Account Dashboard</a></li>
+		</ul>
+		<?php
+		}else{
+		?>
+		<ul>
+			<li><a href="product.php?action=account">Account Dashboard</a></li>
+			<li><a href="product.php?act=shopping">My Shopping Lists</a></li>
+		</ul>
+		<?php
+		}
+		?>
+		<center><a href="?logout=1">Logout</a></center>
 	</div>
 </body>
 </html>
