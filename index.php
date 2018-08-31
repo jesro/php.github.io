@@ -97,17 +97,16 @@ if(isset($_POST["Login"])){
 		$connect=new PDO("mysql:host=$host;dbname=formdata",$user,$pass);
 		$connect->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 		$conn = $connect->prepare('SELECT * FROM formtable WHERE email=:email');
-		//$conn->bindParam(':email',$email);
 		$conn->execute(array(':email'=>$email));
-		//$conn->execute();
 		$full= $conn->fetch(PDO::FETCH_ASSOC);
 		if($conn->rowCount()>0){	
-		//if($full && password_verify($pass,$full['pass'])){
 		if(password_verify($password,$full['pass'])){
 			session_regenerate_id();
 			$_SESSION["authorized"]=true;
 			$_SESSION["email"] = $full["email"];
 			$_SESSION["name"]= $full["first_name"];
+			$_SESSION["second"]=$full["last_name"];
+			$_SESSION["date"]=$full["reg_date"];
 			session_write_close();
 			$loginsuccess =  $_SESSION['name'] ." ! Login Successful";
 			header("location:product.php");
@@ -116,7 +115,6 @@ if(isset($_POST["Login"])){
 			$loginsuccess =  "Login Failed";
 		}
 	}else{
-		//$conn->rowCount()<0;
 		$loginsuccess =  "Not an existing User";
 	}
 	}catch(PDOException $e){
@@ -151,13 +149,13 @@ if(isset($_POST["Login"])){
 	?>
 	<h3><u>REGISTER</u></h3>
 	<form action="<?php htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post">
-		<input type="text" placeholder="First name" name="first" <?php if($errfirst)echo 'style="border:1px solid red";' ?>>
+		<input type="text" placeholder="First name" name="first" <?php if($errfirst)echo 'style="border:1px solid red";' ?> value="<?php echo $first; ?>">
 		<span><font color="red">*<?php echo $errfirst; ?></font></span><br>
-		<input type="text" placeholder="Last name" name="last" <?php if($errlast)echo 'style="border:1px solid red";' ?>>
+		<input type="text" placeholder="Last name" name="last" <?php if($errlast)echo 'style="border:1px solid red";' ?> value="<?php echo $last; ?>">
 		<span><font color="red">*<?php echo $errlast; ?></font></span><br>
-		<input type="text" placeholder="Email Address" name="email" <?php if($erremail)echo 'style="border:1px solid red";' ?>>		
+		<input type="text" placeholder="Email Address" name="email" <?php if($erremail)echo 'style="border:1px solid red";' ?> value="<?php echo $email; ?>">		
 		<span><font color="red">*<?php echo $erremail; ?></font></span><br>
-		<input type="text" placeholder="Password" name="password" <?php if($errpass)echo 'style="border:1px solid red";' ?>>
+		<input type="text" placeholder="Password" name="password" <?php if($errpass)echo 'style="border:1px solid red";' ?> value="<?php echo $password; ?>">
 		<span><font color="red">*<?php echo $errpass; ?></font></span><br>
 		<em>8-20 Characters of 2 types: Upper, Lower, Numeric, Special</em>	<br>
 		<pre><font color="green"><?php echo $green; ?></font></pre>
