@@ -60,16 +60,23 @@ if(isset($_POST["Register"])){
 			id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 			reg_date TIMESTAMP
 			)');
-			echo "Created the Database and Table !"."<br>";
-			$conn = $connect->prepare("INSERT INTO formtable (first_name,last_name,email,pass) 
+			//echo "Created the Database and Table !"."<br>";
+			$conne = $connect->prepare('SELECT * FROM formtable WHERE email=:email');
+			$conne->execute(array(':email'=>$email));
+			$full= $conne->fetch(PDO::FETCH_ASSOC);
+			if($conne->rowCount()>0){
+				$sucessmessage = "You are already registered";
+			}else{
+				$conn = $connect->prepare("INSERT INTO formtable (first_name,last_name,email,pass) 
 				VALUES (:first_name,:last_name,:email,:pass)");
-			$conn->bindParam(':first_name',$first);
-			$conn->bindParam(':last_name',$last);
-			$conn->bindParam(':email',$email);
-			$passhash = password_hash($password, PASSWORD_DEFAULT);
-			$conn->bindParam(':pass',$passhash);
-			$conn->execute();
-			$sucessmessage = "Form Submitted SuccessFully !"."<br>";
+				$conn->bindParam(':first_name',$first);
+				$conn->bindParam(':last_name',$last);
+				$conn->bindParam(':email',$email);
+				$passhash = password_hash($password, PASSWORD_DEFAULT);
+				$conn->bindParam(':pass',$passhash);
+				$conn->execute();
+				$sucessmessage = "Form Submitted SuccessFully !"."<br>";
+			}
 		}catch(PDOException $e){
 			die("My Error : ".$e->getMessage());
 		}
