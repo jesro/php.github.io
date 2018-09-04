@@ -2,8 +2,8 @@ define(['jquery','knockoutjs'],function($,ko){
 var viewModel=function(){
 	var self = this;
 	self.optionz = ko.observableArray(['NA',1,3,5,7,20]);
-	self.pagesize = ko.observable(20); 
-	self.thispage = ko.observable(0);
+	self.mychoosepage = ko.observable(20); 
+	self.countpage = ko.observable(0);
 	self.pagineation = ko.observableArray();
 	//JSON Data
 	self.myProducts=ko.observableArray();
@@ -38,18 +38,46 @@ var viewModel=function(){
 		});
 	});
 	self.page = ko.computed(function () {
-    if (self.pagesize() == "NA") {
+    if (self.mychoosepage() == "NA") {
         self.pagineation(self.Products().slice(0));
     } else {
-        var paging = parseInt(self.pagesize(), 10),
-         varone = paging * self.thispage(),
+        var paging = parseInt(self.mychoosepage(), 10),
+         varone = paging * self.countpage(),
          vartwo = varone + paging;
-
         self.pagineation(self.Products().slice(varone, vartwo));
     }
 
 });
 
+self.allvars = function () {
+    var totpages = self.Products().length / self.mychoosepage() || 1;
+    return Math.ceil(totpages);
+}
+self.nextpage = function () { 
+    if (self.countpage() < self.allvars() - 1) {
+        self.countpage(this.countpage() + 1);
+        self.prevproduct(true);
+    }else if (self.countpage() == self.allvars() - 1){
+    	self.nextproduct(false);
+    }
+}
+self.previouspage = function () { 
+    if (self.countpage() > 0) {
+        self.countpage(this.countpage() - 1);
+        self.nextproduct(true);
+    }else if(self.countpage() == 0){
+    	self.prevproduct(false);
+    }
+}
+//shopping list
+self.shopme=function(shopper){
+	window.location.href="?shopimage="+shopper.image+"&shopname="+shopper.name+"&shopsku="+shopper.sku+"&shopprice="+shopper.price;
+}
+//end shopping list
+//pagination enable
+self.prevproduct = ko.observable(false);
+self.nextproduct = ko.observable(true);
+//end pagination enable
 }
 
 ko.applyBindings(viewModel);
