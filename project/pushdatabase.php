@@ -10,12 +10,17 @@ if(isset($_GET['logout'])==1){
 <head>
 	<meta charset="UTF-8">
 	<title>Push Database</title>
+	<link rel="stylesheet" href="style.css">
 	<script data-main="libs/config" src="libs/require.js"></script>
 </head>
 <body>
+	<nav>
+  <button data-bind="click:previouspage,enable:prevproduct">Previous</a>
+  <button data-bind="click:nextpage,enable:nextproduct">Next</a>
+</nav>
 	<table>
 		<td>
-			<select data-bind="options:optionz ,value: pagesize"></select>
+			<select data-bind="options:optionz ,value: mychoosepage"></select>
 		</td>
 	<td>
 		<label><strong>Filter By</strong></label>
@@ -157,7 +162,8 @@ if(isset($_GET['logout'])==1){
 			<!-- <td><span>+<input type="number"><span>-</span></span></td>  -->
 			
 	<?php if(isset($_SESSION["email"])){ ?>
-		<td><button>ADD TO MY SHOPPING LIST</button></td></tr></table>
+		<td><form method="get"><input type="button" data-bind="click:shopme" name="shoppinglist" value="ADD TO MY LIST"></input></form>
+		</td></tr></table>
 		<?php }
 			}elseif((isset($_SESSION["user"])=='admin')&&!isset($_SESSION["email"])){
 				foreach ($alldata as $row) { 
@@ -169,7 +175,6 @@ if(isset($_GET['logout'])==1){
 			<td><strong><?php echo $row['price'] ?></strong></td>
 			<td><a href="<?php echo 'edit.php?id='.$row['id']; ?>" target="_blank">EDIT</a></td>
 			<td><a href="<?php echo '?delete='.$row['id']; ?>">DELETE</a></td>
-			<td><em></em></td>
 				</tr></table>
 			<?php 
 			}
@@ -193,6 +198,44 @@ if(isset($_GET['logout'])==1){
 		$connect=null;
 	} 
 
+	if(isset($_GET["shopname"])){
+		try{
+			$shopconnect = new PDO("mysql:host=$host;dbname=jsondata",$user,$pass);
+			$shopconnect->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
+			$shopconnect->query('CREATE TABLE IF NOT EXISTS shoppinglist(
+			shopimage VARCHAR(255) NOT NULL,
+			shopname VARCHAR(255) NOT NULL,
+			shopsku VARCHAR(255) NOT NULL,
+			shopprice VARCHAR(255) NOT NULL,
+			shopid INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+			reg_date TIMESTAMP
+			)');
+			$shopimage = $_GET['shopimage'];
+			$shopname = $_GET['shopname'];
+			$shopsku = $_GET['shopsku'];
+			$shopprice = $_GET['shopprice'];
+			$shopconne = $shopconnect->prepare('SELECT * FROM shoppinglist WHERE shopimage=:shopimage AND shopname=:shopname 
+				AND shopsku=:shopsku AND shopprice=:shopprice');
+			$shopconne->execute(array(':shopimage'=>$shopimage,':shopname'=>$shopname,':shopsku'=>$shopsku,':shopprice'=>$shopprice));
+			$shopfull= $shopconne->fetch(PDO::FETCH_ASSOC);
+			if($shopconne->rowCount()>0){
+				//echo "<script>alert('YOU ALREADY ADDED THIS PRODUCT')</script>";
+			}else{
+   			$shopconn = $shopconnect->prepare("INSERT INTO shoppinglist (shopimage,shopname,shopsku,shopprice) 
+				VALUES (:shopimage,:shopname,:shopsku,:shopprice)");
+				$shopconn->bindParam(':shopimage',$shopimage);
+				$shopconn->bindParam(':shopname',$shopname);
+				$shopconn->bindParam(':shopsku',$shopsku);
+				$shopconn->bindParam(':shopprice',$shopprice);
+				$shopconn->execute();
+				//echo "<script>alert('PRODUCT ADDED TO YOUR LIST')</script>";
+			}
+		}catch(PDOException $e){
+			die("My Error : ".$e->getMessage());
+		}
+		$shopconnect=null;
+		echo "<script>window.open('product.php?act=shopping')</script>";
+		} 
 	?>
 	<script>
 		require(['config'],function(){

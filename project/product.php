@@ -39,7 +39,36 @@ if(!isset($_SESSION["name"])&&!isset($_SESSION["user"])){
 		{
 		?>
 		<center><h3>My Shopping List</h3></center>
+		<?php
+		$host='localhost';
+		$user='root';
+		$pass='';
+		try{
+			$shopconnect = new PDO("mysql:host=$host;dbname=jsondata",$user,$pass);
+			$shopconnect->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
+			$shopconne = $shopconnect->prepare('SELECT * FROM shoppinglist ORDER BY shopid ASC');
+			$shopconne->execute();
+			$shopfull= $shopconne->fetchAll(PDO::FETCH_ASSOC);
+		if(($shopfull>0)&&($_SESSION["name"]=='jesro')){
+			foreach ($shopfull as $row) { 
+		?>
+		<table><tr>
+			<td><img src="<?php echo $row['shopimage'] ?>" alt="product_image" height="50" width="50"></td> 
+			<td><pre>SKU: <?php echo $row['shopsku'] ?></pre></td>
+			<td><h5><?php echo $row['shopname'] ?></h5></td>
+			<td><strong><?php echo $row['shopprice'] ?></strong></td>
+		</tr></table>
+		<?php }
+		}else{
+		?>
 		<pre>You have no items in your Shopping List</pre>
+		<?php
+		}
+		}catch(PDOException $e){
+			die("My Error : ".$e->getMessage());
+		}
+		$shopconnect=null;
+		?>
 		<ul>
 			<li><a href="product.php?action=account">Account Dashboard</a></li>
 		</ul>
