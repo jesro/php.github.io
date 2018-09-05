@@ -1,8 +1,10 @@
 <?php
 		$host='localhost';
 		$user='root';
-		$pass='';
+		$pass=''; 
+
 		try{
+
 			$connect = new PDO("mysql:host=$host;dbname=jsondata",$user,$pass);
 			$connect->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 			$connect->query('CREATE TABLE IF NOT EXISTS dropdowntable(
@@ -11,6 +13,7 @@
 			id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 			reg_date TIMESTAMP
 			)');
+
 			$conn = $connect->prepare("INSERT INTO dropdowntable (first,second) 
 				VALUES (:first,:second)");
 				$conn->bindParam(':first',$one);
@@ -28,11 +31,13 @@
 				$two="277 Volt";
 				$conn->execute();		
 				
-			//json data
-			
-			//end json data
+
 		}catch(PDOException $e){
+
 			die("My Error : ".$e->getMessage());
+
 		}
+
 		$connect=null;
-	?>
+		
+?>
