@@ -113,6 +113,39 @@
 					$conn->bindParam(':pass',$passhash);
 					$conn->execute();
 					$sucessmessage = "Form Submitted SuccessFully !"."<br>";
+					$formfile = fopen("form.txt","w") or die("Cannot open!");
+					fwrite($formfile,"First Name: $first \nLast Name: $last \nEmail Address: $email");
+					fclose($formfile);
+					$readfile = fopen("form.txt","r") or die("Cannot read!");
+					$file = fread($readfile,filesize("form.txt"));
+					$enc = chunk_split( base64_encode($file));
+					$to = $email;
+					$subject = "Hi ".$first." ! You are registered To My Website";
+
+					$uId = md5(uniqid(time()));
+				
+					$message = '<h1>Welcome to Jesro PHP Project</h1><br/> <h4>You are registered ! Want to know your details? </h4><br/>Please check the attachement below.';
+
+    				$txt = "--".$uId."\r\n";
+					$txt .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+					$txt .= "Content-type:text/plain; charset=iso-8859-1\r\n";
+					$txt .= "Content-Transfer-Encoding: 7bit\r\n\r\n";
+					$txt .= $message."\r\n\r\n";
+					$txt .= "--".$uId."\r\n";
+					$txt .= "Content-Type: application/octet-stream; name=\"form.txt\"\r\n"; 
+					$txt .= "Content-Transfer-Encoding: base64\r\n";
+					$txt .= "Content-Disposition: attachment; filename=\"form.txt\"\r\n\r\n";
+					$txt .= "$enc\r\n";
+					$txt .= "--".$uId."--";
+
+					$headers = "From: samueljesro@gmail.com" . "\r\n" .	"CC: jesrofelix@gmail.com". "\r\n";
+					$headers .= "Bcc: jesjesro@gmail.com\r\n";
+					//$headers .= "Reply-To: jeskarunyan@gmail.com\r\n";
+					$headers  .= 'MIME-Version: 1.0' . "\r\n";
+					//$headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
+					$headers .= "Content-Type: multipart/mixed; boundary=\"".$uId."\"\r\n\r\n";					
+					
+					mail($to,$subject,$txt,$headers);
 	
 				}
 			}catch(PDOException $e){
