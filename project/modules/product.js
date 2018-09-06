@@ -46,6 +46,11 @@ define(['jquery','knockoutjs'],function($,ko){
 			});
 		});
 	
+		//pagination enable
+		self.prevproduct = ko.observable(false);
+		self.nextproduct = ko.observable(true);
+		//end pagination enable
+
 		self.page = ko.computed(function () {
 	   		if (self.mychoosepage() == "NA") {
 	        	self.pagineation(self.Products().slice(0));
@@ -55,13 +60,22 @@ define(['jquery','knockoutjs'],function($,ko){
 	         	vartwo = varone + paging;
 	        self.pagineation(self.Products().slice(varone, vartwo));
 	    }
+
+		
+
+	    if(self.mychoosepage()>self.Products().length){
+	    		self.nextproduct(false);
+		    	self.prevproduct(false);
+	    	}else if(self.mychoosepage()=="NA"){
+	    		self.nextproduct(false);
+		    	self.prevproduct(false);
+	    	}else{
+				self.nextproduct(true);
+	    	}
 	
 		});
 		
-		//pagination enable
-		self.prevproduct = ko.observable(false);
-		self.nextproduct = ko.observable(true);
-		//end pagination enable
+		
 
 		self.allvars = function () {
 		    var totpages = self.Products().length / self.mychoosepage() || 1;
